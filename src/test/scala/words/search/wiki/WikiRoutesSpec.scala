@@ -6,10 +6,10 @@ import org.http4s.{Method, Request, Uri, _}
 import scala.concurrent.ExecutionContext
 
 /**
-  * Created by Bondarenko on Sep, 20, 2019
-  * 5:26 PM.
-  * Project: words-search
-  */
+ * Created by Bondarenko on Sep, 20, 2019
+ * 5:26 PM.
+ * Project: words-search
+ */
 class WikiRoutesSpec extends org.specs2.mutable.Specification with KleisliSyntax {
 
   implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
@@ -59,6 +59,12 @@ class WikiRoutesSpec extends org.specs2.mutable.Specification with KleisliSyntax
 
     }
 
+    "return Bad request if repo fails" >> {
+      usagesByRepo(wikiRepoAlwaysFails)(uri"/api/get-word-usages/Snowdonia").status must beEqualTo(
+        Status.BadRequest
+      )
+    }
+
   }
 
   private val wikiRepo = new WikiRepo[IO] {
@@ -81,8 +87,14 @@ class WikiRoutesSpec extends org.specs2.mutable.Specification with KleisliSyntax
     }
   }
 
-  private def usages(uri: Uri) = {
+  private val wikiRepoAlwaysFails = new WikiRepo[IO] {
+    def findWikiPages(words: String): IO[Stream[WikiPage]] = IO.pure[Stream[WikiPage]](???)
+  }
+
+  private def usages(uri: Uri) = usagesByRepo(wikiRepo)(uri)
+
+  private def usagesByRepo(repo: WikiRepo[IO])(uri: Uri) = {
     val request = Request[IO](Method.GET, uri)
-    WikiRoutes(WordsService[IO](wikiRepo)).orNotFound(request).unsafeRunSync()
+    WikiRoutes(WordsService[IO](repo)).orNotFound(request).unsafeRunSync()
   }
 }

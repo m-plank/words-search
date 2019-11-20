@@ -1,0 +1,1 @@
+coffee -o public/assets/ -w public/coffeescript

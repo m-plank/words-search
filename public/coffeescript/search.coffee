@@ -3,7 +3,7 @@
 class SearchResults
     constructor: (@word, @usages) ->
     toHtml: ->
-        highLightWord = (str, word) -> str.replace new RegExp(word, 'gi'), "<strong>#{word}</strong>"
+        highLightWord = (str, word) -> str.replace new RegExp("(#{word})", 'gi'), '<strong>$1</strong>'
         for example in @usages
             "<p>#{highLightWord example, @word}</p>"
     isEmpty: -> @usages.length == 0
@@ -19,25 +19,30 @@ class API
 					response = JSON.parse xhr.responseText
 					results = response.usages
 					callback new SearchResults(response.word, response.usages)
+				else
+					console.log('no gain no pain')
+					$('wiki-examples').innerHTML = "ERROR: #{xhr.responseText}"
 		xhr.send null
 
 
+
+@$ = (id) -> document.getElementById(id)
+
 @doSearch = ->
-	$ = (id) -> document.getElementById(id)
+
 	word = $("searchQuery").value
-	console.log("WORD:#{word}")
 	appender = (data) ->
-		console.log data
 		if !data.isEmpty()
-			console.log data
 			$('wiki-examples').innerHTML = ''
 			data.toHtml().forEach (x) ->
 				$('wiki-examples').innerHTML += "#{x}"
 		else
-			console.log 'empty result'
 			$('wiki-examples').innerHTML = 'no results'
-
-	(new API).search word, appender
+	if !!word
+		$('wiki-examples').innerHTML = 'searching ...'
+		(new API).search word, appender
+	else
+		$('wiki-examples').innerHTML = ''
 
 
 

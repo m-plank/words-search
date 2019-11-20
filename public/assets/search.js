@@ -12,7 +12,7 @@
     toHtml() {
       var example, highLightWord, i, len, ref, results1;
       highLightWord = function(str, word) {
-        return str.replace(new RegExp(word, 'gi'), `<strong>${word}</strong>`);
+        return str.replace(new RegExp(`(${word})`, 'gi'), '<strong>$1</strong>');
       };
       ref = this.usages;
       results1 = [];
@@ -41,6 +41,9 @@
             response = JSON.parse(xhr.responseText);
             results = response.usages;
             return callback(new SearchResults(response.word, response.usages));
+          } else {
+            console.log('no gain no pain');
+            return $('wiki-examples').innerHTML = `ERROR: ${xhr.responseText}`;
           }
         }
       };
@@ -49,27 +52,29 @@
 
   };
 
+  this.$ = function(id) {
+    return document.getElementById(id);
+  };
+
   this.doSearch = function() {
-    var $, appender, word;
-    $ = function(id) {
-      return document.getElementById(id);
-    };
+    var appender, word;
     word = $("searchQuery").value;
-    console.log(`WORD:${word}`);
     appender = function(data) {
-      console.log(data);
       if (!data.isEmpty()) {
-        console.log(data);
         $('wiki-examples').innerHTML = '';
         return data.toHtml().forEach(function(x) {
           return $('wiki-examples').innerHTML += `${x}`;
         });
       } else {
-        console.log('empty result');
         return $('wiki-examples').innerHTML = 'no results';
       }
     };
-    return (new API).search(word, appender);
+    if (!!word) {
+      $('wiki-examples').innerHTML = 'searching ...';
+      return (new API).search(word, appender);
+    } else {
+      return $('wiki-examples').innerHTML = '';
+    }
   };
 
   // search = new API

@@ -2,16 +2,16 @@ package words.search
 
 import cats.Applicative
 import cats.effect.Sync
-import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import org.http4s.{EntityDecoder, EntityEncoder}
+import io.circe.{Decoder, Encoder}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
+import org.http4s.{EntityDecoder, EntityEncoder}
 
 /**
-  * Created by Bondarenko on Sep, 20, 2019
-  * 5:06 PM.
-  * Project: words-search
-  */
+ * Created by Bondarenko on Sep, 20, 2019
+ * 5:06 PM.
+ * Project: words-search
+ */
 package object wiki {
 
   case class WordsUsage(word: String, usages: List[String])
